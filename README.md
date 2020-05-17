@@ -73,7 +73,11 @@ You can see more info:
 
 # Prometheus
 
-This is monitoring service. Now, anyone can go here, therefore we don't use credentials.
+This is monitoring service. Now, anyone can go here, therefore we don't use credentials. If you want to add new service, you go to `./prometheus/config.yml`. Than, in section `scrape_configs`, you need add any targets:
+
+      - targets: ['<your-host>:9090']
+      
+After that, rebot container.
 
 # Run
 
