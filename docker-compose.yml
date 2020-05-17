@@ -1,0 +1,52 @@
+version: '3'
+services:
+    vault:
+#        port: 8200
+#        https://github.com/testdrivenio/vault-consul-docker/blob/master/vault/config/vault-config.json
+        image: vault:1.4.1
+        restart: $RESTART
+        cap_add:
+          - IPC_LOCK
+        volumes:
+            - ./vault/config:/vault/config
+            - ./vault/data:/vault/data
+            - ./vault/logs:/vault/logs
+        environment:
+            VAULT_ADDR: http://0.0.0.0:8200
+            VAULT_API_ADDR: http://0.0.0.0:8200
+        command: server
+        network_mode: host
+    prometheus:
+#        port: 9090
+#        https://github.com/vegasbrianc/prometheus/blob/master/docker-compose.yml
+        image: prom/prometheus:v2.18.1
+        restart: $RESTART
+        container_name: prometheus
+        command:
+            - --config.file=/etc/prometheus/prometheus.yml
+        volumes:
+            - ./prometheus/config.yml:/etc/prometheus/prometheus.yml:ro
+        network_mode: host
+    pypiserver:
+#        port: 8080
+#        https://pypi.org/project/pypiserver/
+        image: pypiserver/pypiserver:v1.3.2
+        restart: $RESTART
+        volumes:
+            - ./.htpasswd:/data/auth/.htpasswd
+#            - ./pypi/packages:/data/packages
+        command: -P /data/auth/.htpasswd -a update,download,list /data/packages
+        network_mode: host
+    registry:
+#        port: 5000
+#        https://hub.docker.com/_/registry
+        restart: $RESTART
+        image: registry:2.7.1
+        environment:
+            REGISTRY_AUTH: htpasswd
+            REGISTRY_AUTH_HTPASSWD_PATH: /auth/.htpasswd
+            REGISTRY_AUTH_HTPASSWD_REALM: Registry Realm
+        volumes:
+            - ./docker/data:/var/lib/registry
+            - ./.htpasswd:/auth/.htpasswd
+        network_mode: host
