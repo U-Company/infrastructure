@@ -50,3 +50,11 @@ services:
             - ./docker/data:/var/lib/registry
             - ./.htpasswd:/auth/.htpasswd
         network_mode: host
+    jenkins:
+        image: jenkins/jenkins:lts
+        restart: $RESTART
+        volumes:
+            - ./jenkins:/var/jenkins_home
+        ports:
+          - 34567:8080
+          - 50000:50000

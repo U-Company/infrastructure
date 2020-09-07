@@ -5,9 +5,14 @@ We have some developers services:
 - [PyPi-Registry](https://github.com/pypiserver/pypiserver)
 - [Docker-Registry](https://docs.docker.com/registry/), [github](https://github.com/docker/distribution), [docker.hub](https://hub.docker.com/_/registry)
 - [Vault](https://github.com/hashicorp)
+- [Jenkins](https://www.jenkins.io/)
 - [Prometheus](https://prometheus.io/)
 
 We use a very simple configuration for our needs.
+
+# Jenkins
+
+CI/CD util for delivery code to environment. We use this forked [repository](https://github.com/U-Company/jenkins-docker-in-docker)
 
 # Vault
 
