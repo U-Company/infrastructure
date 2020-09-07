@@ -7,8 +7,11 @@ We have some developers services:
 - [Vault](https://github.com/hashicorp)
 - [Jenkins](https://www.jenkins.io/)
 - [Prometheus](https://prometheus.io/)
+- [Jaeger](https://www.jaegertracing.io/)
 
 We use a very simple configuration for our needs.
+
+# Jaeger
 
 # Jenkins
 
