@@ -17,6 +17,11 @@ We use a very simple configuration for our needs.
 
 CI/CD util for delivery code to environment. We use this forked [repository](https://github.com/U-Company/jenkins-docker-in-docker)
 
+Before starting, do this:
+
+    mkdir jenkins
+    chmod 777 ./jenkins
+
 # Vault
 
 Vault is saver of credentials and shared data of our services. We save here shared: 
