@@ -1,0 +1,92 @@
+version: "3"
+
+volumes:
+  grafanadata:
+  tempodata:
+  jaegerdata:
+
+services:
+  prometheus:
+    image: prom/prometheus
+    restart: $RESTART
+    ports:
+      - 9090:9090
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+
+  grafana:
+    image: grafana/grafana
+    restart: $RESTART
+    ports:
+      - 3001:3000
+    volumes:
+      - grafanadata:/var/lib/grafana
+
+  loki:
+    image: grafana/loki:2.0.0
+    restart: $RESTART
+    ports:
+      - "3100:3100"
+    command: -config.file=/etc/loki/local-config.yaml
+
+  # For OpenTelemetry
+  jaeger:
+    image: jaegertracing/all-in-one
+    restart: $RESTART
+    environment:
+      SPAN_STORAGE_TYPE: badger
+      BADGER_EPHEMERAL: "false"
+      BADGER_DIRECTORY_VALUE: /badger/data
+      BADGER_DIRECTORY_KEY: /badger/key
+      JAEGER_DISABLED: "false"
+    volumes:
+      - jaegerdata:/badger
+    ports:
+      #      - "6832/udp"
+      - 16686:16686
+      - 6831:6831/udp
+      - 14268
+      - 14250
+
+  #  jaeger-all-in-one:
+  #    image: jaegertracing/all-in-one
+  #    environment:
+  #      - JAEGER_DISABLED=false
+  #    networks:
+  #      - dev
+  #    ports:
+  #      - 16686:16686
+  #      - 6831:6831/udp
+  #      - 14268
+  #      - 14250
+
+  # Zipkin
+  zipkin-all-in-one:
+    image: openzipkin/zipkin:latest
+    restart: $RESTART
+    #    networks:
+    #      - dev
+    ports:
+      - "9411:9411"
+  # Collector
+  otel-collector:
+    image: otel/opentelemetry-collector:latest
+    command: ["--config=/etc/otel-collector-config.yaml", "${OTELCOL_ARGS}"]
+    volumes:
+      - ./otel-collector-config.yaml:/etc/otel-collector-config.yaml
+    #    networks:
+    #      - dev
+    ports:
+      - "1888:1888" # pprof extension
+      - "8888:8888" # Prometheus metrics exposed by the collector
+      - "8889:8889" # Prometheus exporter metrics
+      - "13133:13133" # health_check extension
+      - "4317:4317" # OTLP gRPC receiver
+      # - "55679:55679" # zpages extension
+      - "9411" # Zipkin receiver
+      - "55679" # zpages extension
+    depends_on:
+      - jaeger
+      - zipkin-all-in-one
+#networks:
+#  dev:

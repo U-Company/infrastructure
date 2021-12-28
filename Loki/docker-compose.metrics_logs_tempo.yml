@@ -1,0 +1,36 @@
+version: "3.9"
+volumes:
+  grafanadata:
+  tempodata:
+services:
+  prometheus:
+    image: prom/prometheus
+    ports:
+      - 9090:9090
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+  grafana:
+    image: grafana/grafana
+    ports:
+      - 3001:3000
+    volumes:
+      - grafanadata:/var/lib/grafana
+  loki:
+    image: grafana/loki:2.0.0
+    ports:
+      - "3100:3100"
+    command: -config.file=/etc/loki/local-config.yaml
+  tempo:
+    image: grafana/tempo:latest
+    command: ["-config.file=/etc/tempo.yaml"]
+    volumes:
+      - ./tempo-local.yaml:/etc/tempo.yaml
+      - tempodata:/tmp/tempo
+    ports:
+      # - "14268"      # jaeger ingest, Jaeger - Thrift HTTP
+      # - "14250"      # Jaeger - GRPC
+      # - "55680"      # OpenTelemetry
+      # - "3100"       # tempo
+      # - "6831/udp"   # Jaeger - Thrift Compact
+      - "6832/udp" # Jaeger - Thrift Binary
+
